@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aks-pipeline-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aks-pipeline-app
+  template:
+    metadata:
+      labels:
+        app: aks-pipeline-app
+    spec:
+      containers:
+      - name: aks-container
+        image: azureprojects123.azurecr.io/aks-pipeline:latest
+        ports:
+        - containerPort: 3000
