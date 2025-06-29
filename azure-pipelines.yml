@@ -1,4 +1,4 @@
-# This pipeline is intentionally disabled.
+# This pipeline is intentionally disabled
 # It exists to prevent Azure DevOps from running the default pipeline.
 # Real deployment is handled by GitHub Actions now.
 
