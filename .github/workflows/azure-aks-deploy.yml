@@ -1,0 +1,39 @@
+name: Deploy to AKS
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  ACR_NAME: azureprojects123
+  IMAGE_NAME: aks-store-demo
+  RESOURCE_GROUP: cost
+  CLUSTER_NAME: aks-pipeline-cluster
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Build and push Docker image
+      run: |
+        az acr login --name $ACR_NAME
+        docker build -t $ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.run_number }} .
+        docker push $ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.run_number }}
+
+    - name: Set AKS context
+      run: |
+        az aks get-credentials --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME --overwrite-existing
+
+    - name: Deploy to AKS
+      run: |
+        kubectl apply -f manifests/
