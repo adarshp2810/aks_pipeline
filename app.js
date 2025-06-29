@@ -6,6 +6,6 @@ const server = http.createServer((req, res) => {
   res.end('Hello from AKS Pipeline! 🚀\n');
 });
 
-server.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}/`);
+server.listen(port, '0.0.0.0', () => {
+  console.log(`Server running at http://0.0.0.0:${port}/`);
 });
