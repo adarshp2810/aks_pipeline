@@ -4,58 +4,47 @@ trigger:
       - main
 
 variables:
-  imageName: 'aks-pipeline'
+  imageName: 'aks-store-demo'
   acrLoginServer: 'azureprojects123.azurecr.io'
-  kubernetesNamespace: 'default'
 
 pool:
   vmImage: 'ubuntu-latest'
 
 stages:
-  - stage: Build
-    displayName: 'Build and Push Docker Image'
-    jobs:
-      - job: Build
-        steps:
-          - task: AzureCLI@2
-            inputs:
-              azureSubscription: 'azure-sub-connection'
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                echo "Logging in to ACR..."
-                az acr login --name <your-acr-name>
-                
-                echo "Building image..."
-                docker build -t $acrLoginServer/$imageName:latest .
-                
-                echo "Pushing image..."
-                docker push $acrLoginServer/$imageName:latest
+- stage: Build
+  jobs:
+    - job: BuildAndPush
+      steps:
+        - checkout: self
 
-  - stage: SecurityScan
-    displayName: 'Run Terrascan'
-    jobs:
-      - job: Scan
-        steps:
-          - script: |
-              docker run --rm -v $(System.DefaultWorkingDirectory):/iac aquasec/terrascan scan -d /iac
-            displayName: "Run Terrascan Scan"
+        - task: AzureCLI@2
+          inputs:
+            azureSubscription: 'azure-sub-connection'
+            scriptType: bash
+            scriptLocation: inlineScript
+            inlineScript: |
+              az acr login --name azureprojects123
+              docker build -t $acrLoginServer/$imageName:$(Build.BuildId) .
+              docker push $acrLoginServer/$imageName:$(Build.BuildId)
+          displayName: 'Build and Push Docker Image to ACR'
 
-  - stage: Deploy
-    displayName: 'Deploy to AKS'
-    dependsOn: Build
-    jobs:
-      - job: Deploy
-        steps:
-          - task: Kubernetes@1
-            inputs:
-              connectionType: 'Azure Resource Manager'
-              azureSubscriptionEndpoint: 'azure-sub-connection'
-              azureResourceGroup: '<your-resource-group>'
-              kubernetesCluster: 'aks-pipeline-cluster'
-              namespace: 'default'
-              command: apply
-              useConfigurationFile: true
-              configuration: |
-                manifests/deployment.yaml
-                manifests/service.yaml
+- stage: Deploy
+  dependsOn: Build
+  jobs:
+    - job: DeployToAKS
+      steps:
+        - checkout: self
+
+        - task: Kubernetes@1
+          inputs:
+            connectionType: 'Azure Resource Manager'
+            azureSubscriptionEndpoint: 'azure-sub-connection'
+            azureResourceGroup: 'cost'
+            kubernetesCluster: 'aks-pipeline-cluster'
+            namespace: 'default'
+            command: apply
+            useConfigurationFile: true
+            configuration: |
+              manifests/deployment.yaml
+              manifests/service.yaml
+          displayName: 'Deploy to AKS'
