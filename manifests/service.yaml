@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: aks-store-demo-service
 spec:
-  type: LoadBalancer
   selector:
     app: aks-store-demo
+  type: LoadBalancer
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 80
+      port: 80          # Public-facing port
+      targetPort: 3000  # Internal container port
