@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: aks-store-demo
+  labels:
+    app: aks-store-demo
 spec:
   replicas: 1
   selector:
@@ -13,7 +15,7 @@ spec:
         app: aks-store-demo
     spec:
       containers:
-      - name: aks-store-demo
-        image: azureprojects123.azurecr.io/aks-store-demo:5
-        ports:
-        - containerPort: 80
+        - name: aks-store-demo
+          image: azureprojects123.azurecr.io/aks-store-demo:5
+          ports:
+            - containerPort: 3000
