@@ -1,50 +1,12 @@
-trigger:
-  branches:
-    include:
-      - main
+# This pipeline is intentionally disabled.
+# It exists to prevent Azure DevOps from running the default pipeline.
+# Real deployment is handled by GitHub Actions now.
 
-variables:
-  imageName: 'aks-store-demo'
-  acrLoginServer: 'azureprojects123.azurecr.io'
+trigger: none
 
 pool:
   vmImage: 'ubuntu-latest'
 
-stages:
-- stage: Build
-  jobs:
-    - job: BuildAndPush
-      steps:
-        - checkout: self
-
-        - task: AzureCLI@2
-          inputs:
-            azureSubscription: 'azure-sub-connection'
-            scriptType: bash
-            scriptLocation: inlineScript
-            inlineScript: |
-              az acr login --name azureprojects123
-              docker build -t $acrLoginServer/$imageName:$(Build.BuildId) .
-              docker push $acrLoginServer/$imageName:$(Build.BuildId)
-          displayName: 'Build and Push Docker Image to ACR'
-
-- stage: Deploy
-  dependsOn: Build
-  jobs:
-    - job: DeployToAKS
-      steps:
-        - checkout: self
-
-        - task: Kubernetes@1
-          inputs:
-            connectionType: 'Azure Resource Manager'
-            azureSubscriptionEndpoint: 'azure-sub-connection'
-            azureResourceGroup: 'cost'
-            kubernetesCluster: 'aks-pipeline-cluster'
-            namespace: 'default'
-            command: apply
-            useConfigurationFile: true
-            configuration: |
-              manifests/deployment.yaml
-              manifests/service.yaml
-          displayName: 'Deploy to AKS'
+steps:
+- script: echo "Azure pipeline disabled. Using GitHub Actions for CI/CD."
+  displayName: "Disable notice"
