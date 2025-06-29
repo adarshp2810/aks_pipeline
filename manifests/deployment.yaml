@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: aks-store-demo
-        image: azureprojects123.azurecr.io/aks-store-demo:latest
+        image: azureprojects123.azurecr.io/aks-store-demo:5
         ports:
         - containerPort: 80
