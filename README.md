@@ -16,7 +16,7 @@ aks_pipeline/
 └── README.md         # This file
 ```
 
-* * *
+* * *IR@68feefa7-9d9b-4c94-9f6b-92d47c0c1405@Adarsh2810ADF@ServiceEndpoint=adarsh2810adf.westeurope.datafactory.azure.net@Xwmxwr/ZRmt1FbNYBRhaUcpJ1QTCmY2w5RFvOiLHGhM=
 
 ## 📦 Application Code
 
